@@ -1,28 +1,59 @@
 // Variables principales del juego
-let turno = 0; // Contador de turnos
-let playerHP = 15; // Vida del jugador
-let enemyHP = 15;  // Vida del enemigo
-let burnTurns = 0; // Turnos de quemadura
-let turnoEnProceso = false; // Para evitar turnos sobrepuestos
-let combateIniciado = false; // Solo activo después de iniciar combate
+let turno = 0;// Contador de turnos
+let playerHP = 15;// Vida del jugador
+let enemyHP = 15;// Vida del enemigo
+let burnTurns = 0;// Turnos de quemadura
+let turnoEnProceso = false;// Para evitar turnos sobrepuestos
+let combateIniciado = false;// Solo activo después de iniciar combate
 
-// Espera asincrónica
+// Función de espera asincrónica
 function esperar(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Actualiza la UI
+// Actualiza la UI de HP y turnos
 function actualizarUI() {
   document.getElementById("turno").textContent = "Turno: " + turno;
-  document.getElementById("enemyHp").textContent = "HP Enemigo: " + enemyHP;
-  document.getElementById("playerHP").textContent = "HP Propio: " + playerHP;
+  document.getElementById("enemyHp").childNodes[0].textContent = "HP Enemigo: " + enemyHP;
+  document.getElementById("playerHP").childNodes[0].textContent = "HP Propio: " + playerHP;
+
+  // Calcular porcentaje de HP
+  const enemyPercent = Math.max(enemyHP, 0) / 15 * 100;
+  const playerPercent = Math.max(playerHP, 0) / 15 * 100;
+
+  // Actualizar ancho de barra
+  const enemyBar = document.getElementById("enemyHpBar");
+  const playerBar = document.getElementById("playerHpBar");
+  enemyBar.style.width = enemyPercent + "%";
+  playerBar.style.width = playerPercent + "%";
+
+  // Cambiar clase según porcentaje
+  enemyBar.className = "hp-bar-fill " + (enemyPercent > 60 ? "full" : enemyPercent > 30 ? "medium" : "low");
+  playerBar.className = "hp-bar-fill " + (playerPercent > 60 ? "full" : playerPercent > 30 ? "medium" : "low");
 }
 
-// Escribe en el log
-function escribirLog(texto) {
+// Log animado con color
+async function escribirLogAnimado(texto, color = "white") {
   const log = document.getElementById("logCombate");
-  log.innerHTML += "<br>" + texto;
+  const span = document.createElement("span");
+  span.style.color = color;
+  log.appendChild(span);
+  for (let i = 0; i < texto.length; i++) {
+    span.textContent += texto[i];
+    await esperar(25);
+  }
+  log.appendChild(document.createElement("br"));
   log.scrollTop = log.scrollHeight;
+}
+
+// Animación simple de ataque (shake) centrada
+async function animarAtaque(elemento, intensidad = 10) {
+  const original = elemento.style.transform || "";
+  const pasos = [intensidad, -intensidad, intensidad / 2, -intensidad / 2, 0];
+  for (let i = 0; i < pasos.length; i++) {
+    elemento.style.transform = original + ` translateX(${pasos[i]}px)`;
+    await esperar(50);
+  }
 }
 
 // Muestra modal de victoria/derrota
@@ -33,13 +64,30 @@ function mostrarModal(mensaje) {
   modal.style.display = "flex";
 }
 
-// Revisa estado de combate
+// Revisa estado del combate
 function revisarEstado() {
-  if (!combateIniciado) return; // Ignorar si no se inició combate
+  if (!combateIniciado) return;
   if (enemyHP <= 0) {
-    mostrarModal("El enemigo yace derrotado. ¡Eres un héroe de leyenda!");
+    mostrarModal("El enemigo yace derrotado. Lograste pasar una noche más");
   } else if (playerHP <= 0) {
     mostrarModal("Tus fuerzas flaquean… la rata celebra su victoria.");
+  }
+}
+
+// Aplica daño residual por quemadura con efecto visual
+async function aplicarQuemadura() {
+  if (burnTurns > 0) {
+    const enemy = document.querySelector(".enemy-img");
+    // efecto visual
+    enemy.style.filter = "brightness(1.5) sepia(1) hue-rotate(-20deg)";
+    await esperar(300);
+    enemy.style.filter = "";
+
+    enemyHP -= 1;
+    if (enemyHP < 0) enemyHP = 0;
+    await escribirLogAnimado("🔥 La rata sufre 1 de daño por quemadura.", "orange");
+    actualizarUI();
+    burnTurns -= 1;
   }
 }
 
@@ -50,7 +98,7 @@ async function resolverTurno() {
   turno += 1;
   actualizarUI();
 
-  // Revisión inmediata por si ya hubo daño residual
+  // Verificar si ya terminó combate antes de continuar
   if (enemyHP <= 0 || playerHP <= 0) {
     turnoEnProceso = false;
     revisarEstado();
@@ -60,50 +108,49 @@ async function resolverTurno() {
   // Ataque enemigo
   playerHP -= 3;
   if (playerHP < 0) playerHP = 0;
-  escribirLog("🐀 La rata te muerde por 3 de daño.");
+  await animarAtaque(document.querySelector(".enemy-img"));
+  await escribirLogAnimado("🐀 La rata te muerde por 3 de daño.", "red");
   actualizarUI();
-  await esperar(600);
+  await esperar(300);
 
   // Daño por quemadura
-  if (burnTurns > 0) {
-    enemyHP -= 1;
-    burnTurns -= 1;
-    if (enemyHP < 0) enemyHP = 0;
-    escribirLog("🔥 La rata sufre 1 de daño por quemadura.");
-    actualizarUI();
-    await esperar(500);
-  }
+  await aplicarQuemadura();
 
   turnoEnProceso = false;
   revisarEstado();
 }
 
 // Acciones del jugador
-function atacar() {
+async function atacar() {
   if (!combateIniciado || turnoEnProceso) return;
   enemyHP -= 2;
   if (enemyHP < 0) enemyHP = 0;
-  escribirLog("⚔️ Atacas a la rata por 2 de daño.");
-  resolverTurno();
+  await animarAtaque(document.querySelector(".hero-img"));
+  await escribirLogAnimado("⚔️ Atacas a la rata por 2 de daño.", "white");
+  actualizarUI();
+  await resolverTurno();
 }
 
-function quemar() {
+async function quemar() {
   if (!combateIniciado || turnoEnProceso) return;
   enemyHP -= 1;
   burnTurns = 3;
-  escribirLog("🔥 La rata empieza a quemarse.");
-  resolverTurno();
+  await animarAtaque(document.querySelector(".hero-img"));
+  await escribirLogAnimado("🔥 La rata empieza a quemarse y recibe 1 de daño del antorcha.", "orange");
+  actualizarUI();
+  await resolverTurno();
 }
 
-function pocion() {
+async function pocion() {
   if (!combateIniciado || turnoEnProceso) return;
   playerHP += 3;
   if (playerHP > 15) playerHP = 15;
-  escribirLog("❤️ Usas una poción y recuperas 3 HP.");
-  resolverTurno();
+  await escribirLogAnimado("❤️ Usas una poción y recuperas 3 HP.", "green");
+  actualizarUI();
+  await resolverTurno();
 }
 
-// Reinicio del combate
+// Reinicia el combate
 function reinicio() {
   turno = 0;
   playerHP = 15;
@@ -112,19 +159,19 @@ function reinicio() {
   turnoEnProceso = false;
   document.getElementById("logCombate").innerHTML = "El combate comienza...";
   actualizarUI();
-  document.getElementById("resultadoModal").style.display = "none"; // Ocultar modal al reiniciar
+  document.getElementById("resultadoModal").style.display = "none";
 }
 
 // Configuración de eventos al cargar DOM
 document.addEventListener("DOMContentLoaded", () => {
-  // Ocultar modal de resultado al inicio
+ // Ocultar modal de resultado al inicio
   document.getElementById("resultadoModal").style.display = "none";
 
   // Botón iniciar combate
   document.getElementById("botIniciar").addEventListener("click", () => {
     document.getElementById("inicioModal").style.display = "none";
     reinicio();
-    combateIniciado = true; // Activamos el combate
+    combateIniciado = true;// Activamos el combate
   });
 
   // Botones de acción
@@ -141,3 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
     reinicio();
   });
 });
+
+//Barras de vida 
+if(enemyPercent <= 30) document.getElementById("enemyHpBar").className = "hp-bar-fill critical";
+else if(enemyPercent <= 60) document.getElementById("enemyHpBar").className = "hp-bar-fill low";
+else document.getElementById("enemyHpBar").className = "hp-bar-fill";

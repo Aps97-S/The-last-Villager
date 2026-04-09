@@ -18,15 +18,29 @@
 
     <!-- CENTRO -->
     <div class="center">
-      <img class="enemy-img" src="Assets/Enemy.png" alt="Enemigo">
-      <img class="hero-img" src="Assets/Hope.png" alt="Heroe">
+      <div class="enemy-wrapper">
+        <img class="enemy-img" src="Assets/Enemy.png" alt="Enemigo">
+      </div>
+      <div class="hero-wrapper">
+        <img class="hero-img" src="Assets/Hope.png" alt="Heroe">
+      </div>
     </div>
-
     <!-- DERECHA -->
     <div class="right">
       <div class="Cont_turnos" id="turno"> Turno: 00</div>
-      <div class="hp-box" id="enemyHp">HP Enemigo: 15</div>
-      <div class="hp-box" id="playerHP">HP Propio: 15</div>
+      <div class="hp-box" id="enemyHp">
+        HP Enemigo: 15
+        <div class="hp-bar-bg">
+          <div class="hp-bar-fill" id="enemyHpBar"></div>
+        </div>
+      </div>
+
+      <div class="hp-box" id="playerHP">
+        HP Propio: 15
+        <div class="hp-bar-bg">
+          <div class="hp-bar-fill" id="playerHpBar"></div>
+        </div>
+      </div>
 
       <h3>Reglas del juego</h3>
       <p>
@@ -60,7 +74,7 @@
   <!-- Ventana de inicio -->
   <div id="inicioModal" class="modal">
     <div class="modal-content">
-      <h1>¡Bienvenido al combate!</h1>
+      <h1>Una rata gigante sigue en el pueblo,no queda nadie más para defenderlo</h1>
       <button id="botIniciar">Iniciar combate</button>
     </div>
   </div>
