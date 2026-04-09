@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Battle Layout Pixel Art</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="container">
+
+    <!-- IZQUIERDA -->
+    <div class="left">
+      <button id="reiniciar">Reiniciar Combate</button>
+    </div>
+
+    <!-- CENTRO -->
+    <div class="center">
+      <img class="enemy-img" src="Assets/Enemy.png" alt="Enemigo">
+      <img class="hero-img" src="Assets/Hope.png" alt="Heroe">
+    </div>
+
+    <!-- DERECHA -->
+    <div class="right">
+      <div class="Cont_turnos" id="turno"> Turno: 00</div>
+      <div class="hp-box" id="enemyHp">HP Enemigo: 15</div>
+      <div class="hp-box" id="playerHP">HP Propio: 15</div>
+
+      <h3>Reglas del juego</h3>
+      <p>
+        - Botón 1: Ataque básico. Inflige 2 de daño.<br>
+        - Botón 2: Quemar.
+        Inflige 1 de daño,junto con 1 de daño residual por 2 turnos.<br>
+        - Botón 3: Poción.
+        Restaura 3 puntos de HP
+      </p>
+      <h3>Registro de combate</h3>
+      <div id="logCombate" class="combat-log">
+        El combate comienza...
+      </div>
+    </div>
+    <!-- ABAJO -->
+    <div class="bottom">
+      <button id="bot_ataque">🗡️ Ataque</button>
+      <button id="bot_quemar">🔥 Quemar</button>
+      <button id="bot_pocion">❤️ Poción</button>
+    </div>
+
+  </main>
+  <script src="app.js"></script>
+  <!-- Modal oculto al inicio -->
+  <div id="resultadoModal" class="modal">
+    <div class="modal-content">
+      <h2 id="resultadoTexto">¡Victoria!</h2>
+      <button id="botReintentar">Volver a intentar</button>
+    </div>
+  </div>
+  <!-- Ventana de inicio -->
+  <div id="inicioModal" class="modal">
+    <div class="modal-content">
+      <h1>¡Bienvenido al combate!</h1>
+      <button id="botIniciar">Iniciar combate</button>
+    </div>
+  </div>
+</body>
+
+</html>
