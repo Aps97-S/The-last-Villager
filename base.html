@@ -19,7 +19,7 @@
     <!-- CENTRO -->
     <div class="center">
       <div class="enemy-wrapper">
-        <img class="enemy-img" src="Assets/Rat.png" alt="Enemigo">
+        <img class="enemy-img" id="enemySprite" src="Assets/Rat.png" alt="Enemigo">
       </div>
       <div class="hero-wrapper">
         <img class="hero-img" src="Assets/Hope.png" alt="Heroe">
@@ -44,7 +44,7 @@
 
       <h3>Reglas del juego</h3>
       <p>
-        - Botón 1: Ataque básico. Inflige 2 de daño.<br>
+        - Botón 1: Ataque básico. Inflige 2 de daño base y 2 stacks de sangrado.<br>
         - Botón 2: Quemar.
         Inflige 1 de daño,junto con 1 de daño residual por 2 turnos.<br>
         - Botón 3: Poción.
@@ -63,7 +63,8 @@
     </div>
 
   </main>
-  <script src="base.js"></script>
+   <!-- SCRIPT PRINCIPAL (IMPORTANTE: type="module") -->
+  <script type="module" src="./Scripts/base.js"></script>
   <!-- Modal oculto al inicio -->
   <div id="resultadoModal" class="modal">
     <div class="modal-content">
