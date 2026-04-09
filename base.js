@@ -3,6 +3,7 @@ let turno = 0;// Contador de turnos
 let playerHP = 15;// Vida del jugador
 let enemyHP = 15;// Vida del enemigo
 let burnTurns = 0;// Turnos de quemadura
+let bleedStacks = 0; //Turnos de sangrado
 let turnoEnProceso = false;// Para evitar turnos sobrepuestos
 let combateIniciado = false;// Solo activo después de iniciar combate
 
@@ -115,7 +116,8 @@ async function resolverTurno() {
 
   // Daño por quemadura
   await aplicarQuemadura();
-
+  //Daño por sangrado
+  await aplicarSangrado();
   turnoEnProceso = false;
   revisarEstado();
 }
@@ -124,9 +126,10 @@ async function resolverTurno() {
 async function atacar() {
   if (!combateIniciado || turnoEnProceso) return;
   enemyHP -= 2;
+  bleedStacks += 2;
   if (enemyHP < 0) enemyHP = 0;
   await animarAtaque(document.querySelector(".hero-img"));
-  await escribirLogAnimado("⚔️ Atacas a la rata por 2 de daño.", "white");
+  await escribirLogAnimado("⚔️ Atacas a la rata por 2 de daño y aplicas 2 stacks de sangrado.", "white");
   actualizarUI();
   await resolverTurno();
 }
@@ -150,12 +153,36 @@ async function pocion() {
   await resolverTurno();
 }
 
+async function aplicarSangrado() {
+
+  if (bleedStacks <= 0) return;
+
+  const enemy = document.querySelector(".enemy-img");
+
+  // efecto visual sangrado
+  enemy.style.filter = "brightness(0.7) sepia(1) hue-rotate(-50deg)";
+  await esperar(250);
+  enemy.style.filter = "";
+
+  enemyHP -= bleedStacks;
+
+  if (enemyHP < 0) enemyHP = 0;
+
+  await escribirLogAnimado(
+    `🩸 El sangrado inflige ${bleedStacks} de daño (${bleedStacks} stacks).`,
+    "crimson"
+  );
+
+  actualizarUI();
+  bleedStacks--;
+}
 // Reinicia el combate
 function reinicio() {
   turno = 0;
   playerHP = 15;
   enemyHP = 15;
   burnTurns = 0;
+  bleedStacks = 0;
   turnoEnProceso = false;
   document.getElementById("logCombate").innerHTML = "El combate comienza...";
   actualizarUI();
@@ -164,7 +191,7 @@ function reinicio() {
 
 // Configuración de eventos al cargar DOM
 document.addEventListener("DOMContentLoaded", () => {
- // Ocultar modal de resultado al inicio
+  // Ocultar modal de resultado al inicio
   document.getElementById("resultadoModal").style.display = "none";
 
   // Botón iniciar combate
@@ -190,6 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //Barras de vida 
-if(enemyPercent <= 30) document.getElementById("enemyHpBar").className = "hp-bar-fill critical";
-else if(enemyPercent <= 60) document.getElementById("enemyHpBar").className = "hp-bar-fill low";
+if (enemyPercent <= 30) document.getElementById("enemyHpBar").className = "hp-bar-fill critical";
+else if (enemyPercent <= 60) document.getElementById("enemyHpBar").className = "hp-bar-fill low";
 else document.getElementById("enemyHpBar").className = "hp-bar-fill";
