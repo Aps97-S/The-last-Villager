@@ -3,46 +3,60 @@ import { enemigoActual } from './enemigos.js';
 import { resolverTurno } from './turnos.js';
 import { escribirLogAnimado, animarAtaque, actualizarUI } from './ui.js';
 
+// cargar personaje activo
+export async function cargarPersonaje() {
+  const res = await fetch("./Assets/data/personaje.json");
+  const data = await res.json();
+
+  state.player=data.hope;
+  state.playerHP = state.player.hpMax;
+}
+
 export async function atacar() {
   if (state.turnoEnProceso) return;
 
-  enemigoActual.hp -= 2;
+  enemigoActual.hp -= state.player.habilidades.ataque.danio;
 
-  if (!enemigoActual.sangradoResistente) {
-    enemigoActual.efectos.sangrado += 2;
-  }
+  enemigoActual.efectos.sangrado += state.player.habilidades.ataque.sangrado;
 
   await animarAtaque(document.querySelector(".hero-img"));
-  await escribirLogAnimado(`⚔️ Atacas a ${enemigoActual.nombre} por 2 y aplicas 2 stacks de sangrado`,
-    "white");
+  await escribirLogAnimado(
+    `⚔️ ${state.player.nombre} ataca por ${state.player.habilidades.ataque.danio}`,
+    "white"
+  );
 
   actualizarUI();
-  await resolverTurno();
+  resolverTurno();
 }
 
 export async function quemar() {
   if (state.turnoEnProceso) return;
 
-  enemigoActual.hp -= 1;
-  enemigoActual.efectos.quemadura = 3;
+  enemigoActual.hp -= state.player.habilidades.quemar.danio;
 
-  await escribirLogAnimado(`🔥 Quemadura aplicada`, "orange");
+  enemigoActual.efectos.quemadura = state.player.habilidades.quemar.quemadura;
+
+  await escribirLogAnimado("🔥 Usas la antorcha y aplicas quemadura", "orange");
 
   actualizarUI();
-  await resolverTurno();
+  resolverTurno();
 }
 
 export async function pocion() {
   if (state.turnoEnProceso) return;
 
-  state.playerHP += 5;
-  if (state.playerHP > 15) state.playerHP = 15;
+  state.playerHP += state.player.habilidades.pocion.curacion;
 
-  await escribirLogAnimado("❤️ Tomas una pocion y te curas 5 HP", "green");
+  if (state.playerHP > state.player.hpMax) {
+    state.playerHP = state.player.hpMax;
+  }
+
+  await escribirLogAnimado("❤️ Tomas una pocion y recuperas 5 HP", "green");
 
   actualizarUI();
   resolverTurno();
 }
+
 
 export function reinicio() {
   state.turno = 0;

@@ -1,0 +1,23 @@
+{
+  "hope": {
+    "nombre": "Hope",
+    "hpMax": 15,
+    "ataque": 2,
+    "curacion": 3,
+    "critico": 0.1,
+    "asset": "./Assets/Hope.png",
+    "habilidades": {
+      "ataque": {
+        "danio": 2,
+        "sangrado": 2
+      },
+      "quemar": {
+        "danio": 1,
+        "quemadura": 3
+      },
+      "pocion": {
+        "curacion": 5
+      }
+    }
+  }
+}

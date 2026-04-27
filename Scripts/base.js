@@ -1,7 +1,8 @@
 import { cargarEnemigos } from './enemigos.js';
-import { reinicio, atacar, quemar, pocion } from './jugador.js';
+import { cargarPersonaje, reinicio, atacar, quemar, pocion } from './jugador.js';
 
 async function initGame() {
+  await cargarPersonaje();
   await cargarEnemigos();
 
   document.getElementById("resultadoModal").style.display = "none";
