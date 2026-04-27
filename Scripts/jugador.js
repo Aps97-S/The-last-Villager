@@ -38,7 +38,7 @@ export async function pocion() {
   state.playerHP += 5;
   if (state.playerHP > 15) state.playerHP = 15;
 
-  await escribirLogAnimado("❤️ Te curas 5 HP", "green");
+  await escribirLogAnimado("❤️ Tomas una pocion y te curas 5 HP", "green");
 
   actualizarUI();
   resolverTurno();

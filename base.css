@@ -9,7 +9,7 @@ html, body {
 
 /* FONDO */
 body {
-  background-image: url("Assets/Pueblo_en_ruinas.png");
+  background-image: url("Assets/imgs/Pueblo_en_ruinas.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

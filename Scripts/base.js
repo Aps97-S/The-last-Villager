@@ -1,7 +1,9 @@
-// main.js
+import { cargarEnemigos } from './enemigos.js';
 import { reinicio, atacar, quemar, pocion } from './jugador.js';
 
-document.addEventListener("DOMContentLoaded", () => {
+async function initGame() {
+  await cargarEnemigos();
+
   document.getElementById("resultadoModal").style.display = "none";
   document.getElementById("inicioModal").style.display = "flex";
 
@@ -20,4 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("resultadoModal").style.display = "none";
     reinicio();
   });
-  });
+}
+
+document.addEventListener("DOMContentLoaded", initGame);
