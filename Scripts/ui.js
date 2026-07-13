@@ -6,11 +6,8 @@ export function actualizarUI() {
   const enemyBar = document.getElementById("enemyHpBar");
   const playerBar = document.getElementById("playerHpBar");
 
-  // 🔥 seguridad anti-NaN
-  const enemyMax = enemigoActual.hpMax || 1;
-  const playerMax = 15;
   const enemyPercent = Math.max(enemigoActual.hp, 0) / enemigoActual.hpMax * 100;
-  const playerPercent = Math.max(state.playerHP, 0) / 15 * 100;
+  const playerPercent = Math.max(state.playerHP, 0) / state.player.hpMax * 100;
 
   //texto
   document.getElementById("turno").textContent = "Turno: " + state.turno;
@@ -45,13 +42,13 @@ export async function escribirLogAnimado(texto, color = "white") {
 }
 
 export async function animarAtaque(elemento, intensidad = 10) {
-  const original = elemento.style.transform || "";
   const pasos = [intensidad, -intensidad, intensidad / 2, -intensidad / 2, 0];
 
   for (let i = 0; i < pasos.length; i++) {
-    elemento.style.transform = original + ` translateX(${pasos[i]}px)`;
+    elemento.style.transform = `translateX(${pasos[i]}px)`;
     await esperar(50);
   }
+  elemento.style.transform = "";
 }
 
 export function mostrarModal(mensaje) {

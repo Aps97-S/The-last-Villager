@@ -3,23 +3,16 @@ import { enemigoActual } from './enemigos.js';
 import { resolverTurno } from './turnos.js';
 import { escribirLogAnimado, animarAtaque, actualizarUI } from './ui.js';
 
-// cargar personaje activo
-export async function cargarPersonaje() {
-  const res = await fetch("./Assets/data/personaje.json");
-  const data = await res.json();
-
-  state.player=data.hope;
-  state.playerHP = state.player.hpMax;
-}
-
 export async function atacar() {
   if (state.turnoEnProceso) return;
+  state.turnoEnProceso = true;
 
   enemigoActual.hp -= state.player.habilidades.ataque.danio;
+  if (enemigoActual.hp < 0) enemigoActual.hp = 0;
 
   enemigoActual.efectos.sangrado += state.player.habilidades.ataque.sangrado;
 
-  await animarAtaque(document.querySelector(".hero-img"));
+  await animarAtaque(document.querySelector(".hero-wrapper"));
   await escribirLogAnimado(
     `⚔️ ${state.player.nombre} ataca por ${state.player.habilidades.ataque.danio}`,
     "white"
@@ -31,11 +24,14 @@ export async function atacar() {
 
 export async function quemar() {
   if (state.turnoEnProceso) return;
+  state.turnoEnProceso = true;
 
   enemigoActual.hp -= state.player.habilidades.quemar.danio;
+  if (enemigoActual.hp < 0) enemigoActual.hp = 0;
 
   enemigoActual.efectos.quemadura = state.player.habilidades.quemar.quemadura;
 
+  await animarAtaque(document.querySelector(".hero-wrapper"));
   await escribirLogAnimado("🔥 Usas la antorcha y aplicas quemadura", "orange");
 
   actualizarUI();
@@ -44,6 +40,7 @@ export async function quemar() {
 
 export async function pocion() {
   if (state.turnoEnProceso) return;
+  state.turnoEnProceso = true;
 
   state.playerHP += state.player.habilidades.pocion.curacion;
 
@@ -51,7 +48,7 @@ export async function pocion() {
     state.playerHP = state.player.hpMax;
   }
 
-  await escribirLogAnimado("❤️ Tomas una pocion y recuperas 5 HP", "green");
+  await escribirLogAnimado(`❤️ Tomas una pocion y recuperas ${state.player.habilidades.pocion.curacion} HP`, "green");
 
   actualizarUI();
   resolverTurno();
@@ -60,7 +57,7 @@ export async function pocion() {
 
 export function reinicio() {
   state.turno = 0;
-  state.playerHP = 15;
+  state.playerHP = state.player.hpMax;
   state.turnoEnProceso = false;
 
   enemigoActual.hp = enemigoActual.hpMax;
